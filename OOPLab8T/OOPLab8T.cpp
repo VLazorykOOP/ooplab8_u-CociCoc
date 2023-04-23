@@ -2,115 +2,110 @@
 //
 
 template<typename T>
-class LinkedList {
+class List {
 private:
-    // Структура вузла списку
     struct Node {
         T data;
         Node* next;
-        Node(const T& value) : data(value), next(nullptr) {}
+        
+        Node(const T& d, Node* n = nullptr) : data(d), next(n) {}
     };
     
-    Node* head; // Початковий вузол списку
-    int size; // Розмір списку
+    Node* head;
+    int size;
     
 public:
-    		// Конструктор за замовчуванням
-    LinkedList() : head(nullptr), size(0) {}
-    
-   		 // Деструктор
-    ~LinkedList() {
-        Node* current = head;
-        while (current != nullptr) {
-            Node* next = current->next;
-            delete current;
-            current = next;
+    class Iterator {
+    private:
+        Node* node;
+        
+    public:
+        Iterator(Node* n = nullptr) : node(n) {}
+        
+        T& operator*() const {
+            return node->data;
         }
-        size = 0;
+        
+        Iterator& operator++() {
+            node = node->next;
+            return *this;
+        }
+        
+        bool operator==(const Iterator& other) const {
+            return node == other.node;
+        }
+        
+        bool operator!=(const Iterator& other) const {
+            return !(*this == other);
+        }
+    };
+    
+    List() : head(nullptr), size(0) {}
+    
+    ~List() {
+        while (head != nullptr) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
     }
     
-    // Повертає розмір списку
-    int getSize() const {
-        return size;
-    }
-  	  
-  			  // Перевіряє, чи є список порожнім
-    bool isEmpty() const {
-        return head == nullptr;
-    }
-    
-    		// Додає новий елемент до початку списку
-    void addFirst(const T& value) {
-        Node* newNode = new Node(value);
-        newNode->next = head;
-        head = newNode;
+    void push_front(const T& data) {
+        head = new Node(data, head);
         size++;
     }
     
-   			 // Додає новий елемент до кінця списку
-    void addLast(const T& value) {
-        if (isEmpty()) {
-            addFirst(value);
+    void pop_front() {
+        if (head == nullptr) {
             return;
         }
         
-        Node* newNode = new Node(value);
-        Node* current = head;
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        current->next = newNode;
-        size++;
-    }
-    
-    			// Видаляє елемент з початку списку
-    void removeFirst() {
-        if (isEmpty()) {
-            throw std::out_of_range("List is empty");
-        }
-        Node* oldHead = head;
+        Node* temp = head;
         head = head->next;
-        delete oldHead;
+        delete temp;
         size--;
     }
     
-   			 // Видаляє елемент з кінця списку
-    void removeLast() {
-        if (isEmpty()) {
-            throw std::out_of_range("List is empty");
-        }
-        if (getSize() == 1) {
-            removeFirst();
-            return;
-        }
-        Node* current = head;
-        while (current->next->next != nullptr) {
-            current = current->next;
-        }
-        delete current->next;
-        current->next = nullptr;
-        size--;
+    int getSize() const {
+        return size;
     }
     
-   			 // Повертає значення елемента з початку списку
-    const T& getFirst() const {
-        if (isEmpty()) {
-            throw std::out_of_range("List is empty");
-        }
-        return head->data;
+    Iterator begin() const {
+        return Iterator(head);
     }
     
-    				// Повертає значення елемента з кінця списку
-    const T& getLast() const {
-        if (isEmpty()) {
-            throw std::out_of_range("List is empty");
-        }
-        Node* current = head;
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        return current->data;
+    Iterator end() const {
+        return Iterator(nullptr);
     }
 };
+
+
+#include <iostream>
+ 
+int main() {
+    List<int> list;
+    list.push_front(3);
+    list.push_front(2);
+    list.push_front(1);
+    
+    std::cout << "List size: " << list.getSize() << std::endl;
+    
+    for (List<int>::Iterator it = list.begin(); it != list.end(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+    
+    list.pop_front();
+    
+    std::cout << "List size after pop: " << list.getSize() << std::endl;
+    
+    for (List<int>::Iterator it = list.begin(); it != list.end(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+
 
 
