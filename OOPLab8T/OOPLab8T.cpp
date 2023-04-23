@@ -2,86 +2,115 @@
 //
 
 template<typename T>
-void mergeArrays(T* arr1, int size1, T* arr2, int size2, T* result, int& sizeResult) {
-    std::unordered_set<T> seenValues;
+class LinkedList {
+private:
+    // Структура вузла списку
+    struct Node {
+        T data;
+        Node* next;
+        Node(const T& value) : data(value), next(nullptr) {}
+    };
     
-    for (int i = 0; i < size1; i++) {
-        if (seenValues.find(arr1[i]) == seenValues.end()) {
-            seenValues.insert(arr1[i]);
-            result[sizeResult] = arr1[i];
-            sizeResult++;
+    Node* head; // Початковий вузол списку
+    int size; // Розмір списку
+    
+public:
+    		// Конструктор за замовчуванням
+    LinkedList() : head(nullptr), size(0) {}
+    
+   		 // Деструктор
+    ~LinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* next = current->next;
+            delete current;
+            current = next;
         }
+        size = 0;
     }
     
-    for (int i = 0; i < size2; i++) {
-        if (seenValues.find(arr2[i]) == seenValues.end()) {
-            seenValues.insert(arr2[i]);
-            result[sizeResult] = arr2[i];
-            sizeResult++;
+    // Повертає розмір списку
+    int getSize() const {
+        return size;
+    }
+  	  
+  			  // Перевіряє, чи є список порожнім
+    bool isEmpty() const {
+        return head == nullptr;
+    }
+    
+    		// Додає новий елемент до початку списку
+    void addFirst(const T& value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        head = newNode;
+        size++;
+    }
+    
+   			 // Додає новий елемент до кінця списку
+    void addLast(const T& value) {
+        if (isEmpty()) {
+            addFirst(value);
+            return;
         }
-    }
-}
- 
-// Специфікація для типу char*
-void mergeArrays(char** arr1, int size1, char** arr2, int size2, char** result, int& sizeResult) {
-    std::unordered_set<std::string> seenValues;
-    
-    for (int i = 0; i < size1; i++) {
-        if (seenValues.find(std::string(arr1[i])) == seenValues.end()) {
-            seenValues.insert(std::string(arr1[i]));
-            result[sizeResult] = arr1[i];
-            sizeResult++;
+        
+        Node* newNode = new Node(value);
+        Node* current = head;
+        while (current->next != nullptr) {
+            current = current->next;
         }
+        current->next = newNode;
+        size++;
     }
     
-    for (int i = 0; i < size2; i++) {
-        if (seenValues.find(std::string(arr2[i])) == seenValues.end()) {
-            seenValues.insert(std::string(arr2[i]));
-            result[sizeResult] = arr2[i];
-            sizeResult++;
+    			// Видаляє елемент з початку списку
+    void removeFirst() {
+        if (isEmpty()) {
+            throw std::out_of_range("List is empty");
         }
+        Node* oldHead = head;
+        head = head->next;
+        delete oldHead;
+        size--;
     }
-}
- 
-int main() {
-    // Приклад використання для типу int
-    int arr1[] = {1, 2, 3, 4, 5};
-    int arr2[] = {4, 5, 6, 7, 8};
-    int size1 = sizeof(arr1) / sizeof(int);
-    int size2 = sizeof(arr2) / sizeof(int);
-    int resultSize = 0;
-    int* result = new int[size1 + size2];
     
-    mergeArrays(arr1, size1, arr2, size2, result, resultSize);
-    
-    for (int i = 0; i < resultSize; i++) {
-        std::cout << result[i] << " ";
+   			 // Видаляє елемент з кінця списку
+    void removeLast() {
+        if (isEmpty()) {
+            throw std::out_of_range("List is empty");
+        }
+        if (getSize() == 1) {
+            removeFirst();
+            return;
+        }
+        Node* current = head;
+        while (current->next->next != nullptr) {
+            current = current->next;
+        }
+        delete current->next;
+        current->next = nullptr;
+        size--;
     }
-    std::cout << std::endl;
     
-    delete[] result;
+   			 // Повертає значення елемента з початку списку
+    const T& getFirst() const {
+        if (isEmpty()) {
+            throw std::out_of_range("List is empty");
+        }
+        return head->data;
+    }
     
-    // Приклад використання для типу char*
-    char* strArr1[] = {"apple", "orange", "banana"};
-    char* strArr2[] = {"banana", "peach", "kiwi"};
-    int strSize1 = sizeof(strArr1) / sizeof(char*);
-    int strSize2 = sizeof(strArr2) / sizeof(char*);
-    int strResultSize = 0;
-    char** strResult = new char*[strSize1 + strSize2];
-    
-    mergeArrays(strArr1, strSize1, strArr2, strSize2, strResult, strResultSize);
-    
-    for (int i = 0; i < strResultSize; i++) {
-        std  ::cout << strResult[i] << " ";
-}
-std::cout << std::endl;
- 
-for (int i = 0; i < strResultSize; i++) {
-    delete[] strResult[i];
-}
-delete[] strResult;
- 
-return 0;
-}
+    				// Повертає значення елемента з кінця списку
+    const T& getLast() const {
+        if (isEmpty()) {
+            throw std::out_of_range("List is empty");
+        }
+        Node* current = head;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        return current->data;
+    }
+};
 
 
